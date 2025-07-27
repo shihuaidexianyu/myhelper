@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}MyHelper - 智能任务助手{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="jumbotron bg-light p-5 rounded-3">
+            <h1 class="display-4">欢迎使用 MyHelper</h1>
+            <p class="lead">智能任务助手，帮您自动化处理各种任务</p>
+            <hr class="my-4">
+            <p>通过可视化界面管理任务、配置工具和查看执行报告</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-tasks fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">任务管理</h5>
+                <p class="card-text">创建、编辑和管理自动化任务</p>
+                <a href="{{ url_for('web.tasks') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-right"></i> 进入管理
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-tools fa-3x text-success mb-3"></i>
+                <h5 class="card-title">工具配置</h5>
+                <p class="card-text">配置和管理可用工具</p>
+                <a href="{{ url_for('web.tools') }}" class="btn btn-success">
+                    <i class="fas fa-arrow-right"></i> 进入配置
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                <h5 class="card-title">执行报告</h5>
+                <p class="card-text">查看任务执行历史和结果</p>
+                <a href="{{ url_for('web.reports') }}" class="btn btn-info">
+                    <i class="fas fa-arrow-right"></i> 查看报告
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h3>API 接口</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>接口</th>
+                        <th>方法</th>
+                        <th>描述</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>/api/v1/hooks</code></td>
+                        <td>GET</td>
+                        <td>获取所有可用任务</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/hooks/{task_id}</code></td>
+                        <td>POST</td>
+                        <td>触发任务执行</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/reports</code></td>
+                        <td>GET</td>
+                        <td>获取所有执行报告</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/v1/reports/{report_id}</code></td>
+                        <td>GET</td>
+                        <td>获取特定报告详情</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

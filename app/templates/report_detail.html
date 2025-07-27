@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}报告详情 - MyHelper{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-file-alt"></i> 报告详情</h2>
+    <div>
+        <a href="{{ url_for('web.reports') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> 返回列表
+        </a>
+        <button class="btn btn-outline-primary" onclick="refreshReport()">
+            <i class="fas fa-sync-alt"></i> 刷新
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- 基本信息 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> 基本信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>报告ID:</strong> <code>{{ report.report_id }}</code></p>
+                        <p><strong>任务ID:</strong> {{ report.task_id }}</p>
+                        <p><strong>状态:</strong> 
+                            {% if report.status == 'success' %}
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-check"></i> 执行成功
+                                </span>
+                            {% elif report.status == 'failed' %}
+                                <span class="badge bg-danger fs-6">
+                                    <i class="fas fa-times"></i> 执行失败
+                                </span>
+                            {% elif report.status == 'running' %}
+                                <span class="badge bg-primary fs-6">
+                                    <i class="fas fa-spinner fa-spin"></i> 正在执行
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary fs-6">{{ report.status }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if report.timestamps %}
+                        <p><strong>创建时间:</strong> {{ report.timestamps.created_at[:19] if report.timestamps.created_at else '-' }}</p>
+                        <p><strong>开始时间:</strong> {{ report.timestamps.started_at[:19] if report.timestamps.started_at else '-' }}</p>
+                        <p><strong>完成时间:</strong> {{ report.timestamps.finished_at[:19] if report.timestamps.finished_at else '-' }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 执行计划 -->
+        {% if report.plan %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-list-ol"></i> 执行计划</h5>
+            </div>
+            <div class="card-body">
+                {% if report.plan.steps %}
+                    <ol class="list-group list-group-numbered">
+                        {% for step in report.plan.steps %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">{{ step.description }}</div>
+                                {% if step.details %}
+                                <small class="text-muted">{{ step.details }}</small>
+                                {% endif %}
+                            </div>
+                            <span class="badge bg-primary rounded-pill">{{ step.step_id }}</span>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <p class="text-muted">无执行计划</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 执行日志 -->
+        {% if report.execution_log %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-terminal"></i> 执行日志</h5>
+            </div>
+            <div class="card-body">
+                {% if report.execution_log.step_results %}
+                    {% for step_result in report.execution_log.step_results %}
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><strong>步骤:</strong> {{ step_result.step_id }}</span>
+                            <span>
+                                {% if step_result.status == 'success' %}
+                                    <span class="badge bg-success">成功</span>
+                                {% elif step_result.status == 'failed' %}
+                                    <span class="badge bg-danger">失败</span>
+                                {% elif step_result.status == 'running' %}
+                                    <span class="badge bg-primary">运行中</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ step_result.status }}</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            {% if step_result.mcp_request %}
+                            <h6>请求:</h6>
+                            <div class="bg-light p-2 rounded mb-3">
+                                <p><strong>工具:</strong> {{ step_result.mcp_request.tool_name }}</p>
+                                {% if step_result.mcp_request.params %}
+                                <p><strong>参数:</strong></p>
+                                <pre class="bg-white p-2 rounded border"><code>{{ step_result.mcp_request.params | tojson(indent=2) }}</code></pre>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if step_result.mcp_response %}
+                            <h6>响应:</h6>
+                            <div class="bg-light p-2 rounded">
+                                {% if step_result.mcp_response.output %}
+                                <p><strong>输出:</strong></p>
+                                <pre class="bg-white p-2 rounded border"><code>{{ step_result.mcp_response.output }}</code></pre>
+                                {% endif %}
+                                
+                                {% if step_result.mcp_response.error %}
+                                <p><strong>错误:</strong></p>
+                                <pre class="bg-danger text-white p-2 rounded"><code>{{ step_result.mcp_response.error }}</code></pre>
+                                {% endif %}
+                                
+                                {% if step_result.mcp_response.execution_time %}
+                                <p class="mb-0"><strong>执行时间:</strong> {{ step_result.mcp_response.execution_time }}ms</p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">暂无执行日志</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 最终总结 -->
+        {% if report.final_summary %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-summary"></i> 执行总结</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    {{ report.final_summary }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 错误信息 -->
+        {% if report.error %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-exclamation-triangle"></i> 错误信息</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <p><strong>错误消息:</strong> {{ report.error.message }}</p>
+                    {% if report.error.details %}
+                    <p><strong>详细信息:</strong></p>
+                    <pre><code>{{ report.error.details }}</code></pre>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <!-- 触发上下文 -->
+        {% if report.trigger_context %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6><i class="fas fa-cog"></i> 触发上下文</h6>
+            </div>
+            <div class="card-body">
+                <pre class="bg-light p-2 rounded"><code>{{ report.trigger_context | tojson(indent=2) }}</code></pre>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 进度信息 -->
+        {% if report.plan and report.plan.steps %}
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-pie"></i> 执行进度</h6>
+            </div>
+            <div class="card-body">
+                {% set total_steps = report.plan.steps | length %}
+                {% set completed_steps = report.execution_log.step_results | length if report.execution_log and report.execution_log.step_results else 0 %}
+                {% set progress_percent = (completed_steps / total_steps * 100) | round(1) if total_steps > 0 else 0 %}
+                
+                <div class="progress mb-3">
+                    <div class="progress-bar" role="progressbar" 
+                         style="width: {{ progress_percent }}%" 
+                         aria-valuenow="{{ progress_percent }}" 
+                         aria-valuemin="0" aria-valuemax="100">
+                        {{ progress_percent }}%
+                    </div>
+                </div>
+                
+                <p class="mb-0">
+                    <strong>进度:</strong> {{ completed_steps }}/{{ total_steps }} 步骤完成
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function refreshReport() {
+    location.reload();
+}
+
+// 如果任务仍在运行，自动刷新
+document.addEventListener('DOMContentLoaded', function() {
+    const statusBadge = document.querySelector('.badge.bg-primary');
+    if (statusBadge && statusBadge.textContent.includes('正在执行')) {
+        // 每15秒刷新一次
+        setTimeout(function() {
+            location.reload();
+        }, 15000);
+    }
+});
+</script>
+{% endblock %}

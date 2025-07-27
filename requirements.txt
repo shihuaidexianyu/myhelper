@@ -1,0 +1,26 @@
+# MyHelper v0.1.0 Dependencies
+
+# Flask Web Framework
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# HTTP Requests
+requests==2.31.0
+urllib3==2.0.7
+
+# JSON and Data Processing
+# (built-in json module is sufficient)
+
+# Threading and Concurrency
+# (built-in threading and concurrent.futures are sufficient)
+
+# Development Dependencies (optional)
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-flask==1.3.0
+
+# Production WSGI Server (optional)
+gunicorn==21.2.0
+
+# Environment and Configuration
+python-dotenv==1.0.0
