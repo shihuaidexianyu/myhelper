@@ -1,0 +1,62 @@
+{
+  "system": {
+    "name": "MyHelper",
+    "version": "1.0.0",
+    "queue_check_interval": 5,
+    "max_retries": 3,
+    "task_timeout": 3600,
+    "backup_enabled": true,
+    "backup_interval": 86400
+  },
+  "web": {
+    "host": "0.0.0.0",
+    "port": 5000,
+    "debug": false,
+    "secret_key": "myhelper-secret-key-change-in-production",
+    "base_url": "http://localhost:5000"
+  },
+  "llm": {
+    "provider": "openai",
+    "model": "gemini-2.5-flash",
+    "api_base": "http://localhost:3000/v1",
+    "api_key": "sk-aaia2x2aYx3q3qzTX3RLZe3gocWerPOExTRrhNCK5TWkIdEy",
+    "max_tokens": 4000,
+    "temperature": 0.7,
+    "timeout": 60
+  },
+  "reports": {
+    "output_dir": "data/reports",
+    "templates_dir": "templates/reports",
+    "cleanup_days": 30
+  },
+  "notifications": {
+    "max_history": 1000,
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "username": "",
+      "password": "",
+      "from_email": ""
+    },
+    "slack": {
+      "webhook_url": "",
+      "bot_token": "",
+      "bot_name": "MyHelper",
+      "icon_emoji": ":robot_face:"
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "max_file_size": 10485760,
+    "backup_count": 5
+  },
+  "security": {
+    "enable_cors": true,
+    "allowed_origins": [
+      "*"
+    ],
+    "rate_limit_enabled": false,
+    "max_requests_per_minute": 60
+  }
+}
